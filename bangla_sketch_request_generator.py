@@ -45,13 +45,8 @@ def write_to_file(data):
     with open("submission_history.json",'w',encoding='utf-8') as writer:
         json.dump(data,writer, ensure_ascii=False,indent=4)
 
-def main():
-    args=get_arguments() 
-
-    # request params
-    content_url="https://banglasketch.org/SuPara"
-    submit_url='https://banglasketch.org/submitTranslation'
-    headers={
+def get_headers():
+    headers = {
       "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
       "accept-language": "en-US,en;q=0.9",
       "cache-control": "max-age=0",
@@ -62,7 +57,30 @@ def main():
       "sec-fetch-user": "?1",
       "upgrade-insecure-requests": "1"
     }
-    user_agent='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
+    return headers
+
+def get_user_agent():
+    return 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
+
+
+def post_and_get_response_from_website(bangla_to_english_list,data,cookie,headers):
+    print_current_translations(data)
+    bangla_to_english_list.append({"bangla":data['bangla'],'english':data['english']})
+
+    # sleeping for 2 sec so that the websites doesn't ban me
+    sleep(1)
+    response_object=requests.post('https://banglasketch.org/submitTranslation',headers=headers,data=data,cookies=cookie)
+    data=parse_response(response_object)
+    #return data
+
+def main():
+    args=get_arguments() 
+
+    # request params
+    content_url="https://banglasketch.org/SuPara"
+    submit_url='https://banglasketch.org/submitTranslation'
+    headers=get_headers()
+    user_agent=get_user_agent()
     cookie=get_cookiejar(args['cookie'])
 
     # initial request
@@ -76,13 +94,7 @@ def main():
     try:
         while n_translate>0:
             print("\nTrying to translate: ",total-n_translate+1)
-            print_current_translations(data)
-            bangla_to_english_list.append({"bangla":data['bangla'],'english':data['english']})
-
-            # sleeping for 2 sec so that the websites doesn't ban me
-            sleep(1)
-            response_object=requests.post('https://banglasketch.org/submitTranslation',headers=headers,data=data,cookies=cookie)
-            data=parse_response(response_object)
+            post_and_get_response_from_website(bangla_to_english_list,data,cookie,headers)
             n_translate=n_translate-1
             print("Submitted")
     except:
