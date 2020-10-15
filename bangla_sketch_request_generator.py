@@ -44,10 +44,10 @@ def print_current_translations(data):
 def write_to_file(data):
     with open("submission_history.json",'w',encoding='utf-8') as writer:
         json.dump(data,writer, ensure_ascii=False,indent=4)
-def main():
 
+def main():
     args=get_arguments() 
-    
+
     # request params
     content_url="https://banglasketch.org/SuPara"
     submit_url='https://banglasketch.org/submitTranslation'
@@ -91,9 +91,6 @@ def main():
         if len(bangla_to_english_list)>0:
             write_to_file(bangla_to_english_list)
 
-    
-        
-    
 if __name__=='__main__':
     try:
         main()
