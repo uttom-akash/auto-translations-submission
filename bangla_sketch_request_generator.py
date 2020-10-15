@@ -63,15 +63,18 @@ def get_user_agent():
     return 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36'
 
 
-def post_and_get_response_from_website(bangla_to_english_list,data,cookie,headers):
-    print_current_translations(data)
-    bangla_to_english_list.append({"bangla":data['bangla'],'english':data['english']})
+def post_and_get_response_from_website_for_n_times(bangla_to_english_list,n_translate,total,data,cookie,headers):
+    while n_translate>0:
+            print("\nTrying to translate: ",total-n_translate+1)
+            print_current_translations(data)
+            bangla_to_english_list.append({"bangla":data['bangla'],'english':data['english']})
 
-    # sleeping for 2 sec so that the websites doesn't ban me
-    sleep(1)
-    response_object=requests.post('https://banglasketch.org/submitTranslation',headers=headers,data=data,cookies=cookie)
-    data=parse_response(response_object)
-    #return data
+            # sleeping for 2 sec so that the websites doesn't ban me
+            sleep(1)
+            response_object=requests.post('https://banglasketch.org/submitTranslation',headers=headers,data=data,cookies=cookie)
+            data=parse_response(response_object)
+            n_translate=n_translate-1
+            print("Submitted")
 
 def main():
     args=get_arguments() 
@@ -92,11 +95,7 @@ def main():
     bangla_to_english_list=[]
     
     try:
-        while n_translate>0:
-            print("\nTrying to translate: ",total-n_translate+1)
-            post_and_get_response_from_website(bangla_to_english_list,data,cookie,headers)
-            n_translate=n_translate-1
-            print("Submitted")
+       post_and_get_response_from_website_for_n_times(bangla_to_english_list,n_translate,total,data,cookie,headers)
     except:
         raise
     finally:
